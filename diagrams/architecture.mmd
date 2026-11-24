@@ -1,0 +1,31 @@
+flowchart TD
+    A["Website form webhook"] --> B["Authenticate and validate"]
+    B --> C{"Atomic event claim"}
+    B -->|"Invalid"| X["Reject and record reason"]
+    C -->|"Duplicate"| D["Return stored status"]
+    C -->|"New or safe retry"| E["Resolve contact and enrich company"]
+    E --> F["AI requirements extraction"]
+    F --> G{"Schema and evidence valid"}
+    G -->|"No"| H["Human qualification review"]
+    G -->|"Yes"| I["Deterministic lead score"]
+    I --> J["CRM upsert with provenance"]
+    J --> K["Scheduling or follow-up"]
+    K --> L["Proposal draft for review"]
+    L --> M["Await verified contract event"]
+    N["Contract event webhook"] --> O["Verify event and current contract state"]
+    O --> P{"Approved contract and atomic onboarding claim"}
+    P -->|"New and authorised"| Q["Create folders and tasks"]
+    P -->|"Duplicate or not approved"| R["Record status without onboarding"]
+    Q --> S["Internal notification"]
+    S --> T["Persist outcome and redacted log"]
+    R --> T
+    H --> T
+    E -.->|"Execution failure"| U["Bounded retry or failure queue"]
+    F -.->|"Execution failure"| U
+    J -.->|"Execution failure"| U
+    K -.->|"Execution failure"| U
+    L -.->|"Execution failure"| U
+    O -.->|"Execution failure"| U
+    Q -.->|"Execution failure"| U
+    S -.->|"Execution failure"| U
+    U --> T
